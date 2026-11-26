@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#fdfaf5">
+<title>测一测｜你的灵魂属于哪种元素</title>
+<style>
+/* ========== 基础与配色：柔和轻快，纸感暖白 + 墨绿 / 暖橙 ========== */
+:root{
+  --bg1:#fdfaf5; --bg2:#f4eee4;
+  --ink:#2f2e2c; --sub:#6d6a64;
+  --green:#5a6f9c; --green-d:#425584; --green-l:#e9edf6;
+  --orange:#8fa9d9; --seal:#6b7fb5;
+  --card:rgba(255,255,255,.78); --line:rgba(58,107,92,.16);
+  --shadow:0 8px 30px rgba(58,107,92,.09);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  color:var(--ink);background:var(--bg1);min-height:100vh;line-height:1.6;
+  display:flex;justify-content:center;overflow-x:hidden;
+}
+/* 柔和背景光晕 */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(45% 35% at 12% 8%,rgba(217,139,98,.14),transparent 70%),
+    radial-gradient(50% 40% at 88% 18%,rgba(58,107,92,.13),transparent 70%),
+    radial-gradient(60% 50% at 50% 100%,rgba(192,85,63,.08),transparent 70%),
+    linear-gradient(160deg,#fdfaf5,#f4eee4);
+}
+.wrap{position:relative;z-index:1;width:100%;max-width:640px;padding:20px 18px 48px;min-height:100vh}
+
+/* 页面切换 */
+.page{display:none;animation:fade .4s ease both}
+.page.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;
+  box-shadow:var(--shadow);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.btn{cursor:pointer;border:none;font-family:inherit;font-weight:700;transition:transform .14s,box-shadow .2s,opacity .2s}
+.btn:active{transform:scale(.98)}
+.primary{width:100%;padding:15px;font-size:16px;color:#fff;border-radius:14px;
+  background:linear-gradient(100deg,var(--green),var(--green-d));box-shadow:0 8px 22px rgba(58,107,92,.28)}
+.ghost{background:var(--green-l);color:var(--green-d);border:1px solid var(--line);
+  border-radius:12px;padding:12px 18px;font-size:14px}
+.btn[disabled]{opacity:.38;cursor:not-allowed}
+.muted{color:var(--sub);font-size:13px}
+
+/* ========== 首页 ========== */
+.hero{margin-top:26px;padding:34px 24px 30px;text-align:center;position:relative;overflow:hidden}
+.seal{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;
+  border-radius:12px;background:var(--seal);color:#fff;font-size:15px;font-weight:800;
+  letter-spacing:2px;box-shadow:0 6px 16px rgba(192,85,63,.28);margin-bottom:18px;transform:rotate(-4deg)}
+.hero h1{font-size:clamp(24px,6.5vw,32px);line-height:1.45;font-weight:800;color:var(--green-d);letter-spacing:.5px}
+.hero h1 .em{color:var(--orange)}
+.hero .lead{margin-top:16px;font-size:14px;color:var(--sub);line-height:1.9}
+.hero .tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:20px 0 6px}
+.hero .tags span{font-size:12px;padding:6px 11px;border-radius:999px;background:var(--green-l);
+  color:var(--green-d);font-weight:600}
+.hero .note{margin-top:18px;font-size:12px;color:var(--sub);line-height:1.8}
+.start{margin-top:24px}
+
+/* ========== 答题页 ========== */
+.qtop{padding:8px 2px 0}
+.qtop .row{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--sub)}
+.qtop .row b{font-size:20px;color:var(--green-d);font-weight:800}
+.bar{height:7px;border-radius:99px;background:rgba(58,107,92,.12);overflow:hidden;margin:10px 0 22px}
+.bar i{display:block;height:100%;width:0;border-radius:99px;
+  background:linear-gradient(90deg,var(--orange),var(--green));transition:width .3s ease}
+.qcard{padding:24px 20px}
+.qindex{font-size:12px;color:var(--orange);font-weight:800;letter-spacing:1px}
+.qtext{font-size:clamp(18px,4.6vw,21px);font-weight:700;line-height:1.55;margin:10px 0 20px;color:var(--green-d)}
+.opts{display:flex;flex-direction:column;gap:11px}
+.opt{width:100%;text-align:left;display:flex;gap:12px;align-items:flex-start;padding:15px 14px;
+  border-radius:14px;background:#fff;border:1px solid var(--line);color:var(--ink);
+  font-size:14px;line-height:1.55;font-weight:600;box-shadow:0 3px 10px rgba(58,107,92,.05);
+  transition:border-color .15s,background .15s,transform .12s}
+.opt:hover{border-color:var(--green)}
+.opt .k{flex:none;width:26px;height:26px;border-radius:8px;background:var(--green-l);
+  color:var(--green-d);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.opt.sel{border-color:var(--green);background:var(--green-l);transform:scale(.99)}
+.opt.sel .k{background:var(--green);color:#fff}
+.qnav{display:flex;gap:10px;margin-top:20px}
+.qnav .btn{flex:1}
+.qnav .primary{flex:1.4}
+.hint{text-align:center;font-size:11px;color:var(--sub);margin-top:14px}
+
+/* ========== 结果页 ========== */
+.rhead{text-align:center;padding:20px 0 4px}
+.rhead .ico{font-size:40px;line-height:1}
+.rhead .kicker{font-size:12px;color:var(--sub);letter-spacing:2px;margin-top:12px}
+.rhead .name{font-size:clamp(28px,7vw,36px);font-weight:800;color:var(--green-d);margin-top:6px;letter-spacing:1px}
+.rhead .title{font-size:14px;color:var(--orange);font-weight:700;margin-top:4px}
+.match{display:inline-block;margin-top:14px;padding:7px 15px;border-radius:999px;font-size:13px;font-weight:800;
+  background:var(--green-l);color:var(--green-d);border:1px solid var(--line)}
+.rsec{margin-top:16px;padding:20px}
+.rsec h3{font-size:14px;color:var(--green);font-weight:800;margin-bottom:12px;letter-spacing:.5px}
+.rsec h3 .n{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:7px;
+  background:var(--green);color:#fff;font-size:12px;margin-right:8px}
+.rsec p{font-size:14px;line-height:2;color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chips span{font-size:12px;padding:5px 10px;border-radius:9px;background:var(--green-l);
+  color:var(--green-d);font-weight:700}
+.egg{margin-top:10px;padding:14px;border-radius:12px;background:linear-gradient(120deg,rgba(217,139,98,.13),rgba(58,107,92,.08));
+  border:1px dashed rgba(217,139,98,.35);font-size:14px;line-height:1.85}
+.slogan{margin-top:16px;padding:18px;text-align:center;border-radius:14px;
+  background:var(--green-d);color:#fff;font-size:16px;font-weight:800;line-height:1.7;letter-spacing:.5px}
+.share{margin-top:16px;padding:16px}
+.share .lbl{font-size:13px;color:var(--green);font-weight:800;margin-bottom:8px}
+.share .txt{font-size:13px;line-height:1.9;color:var(--ink);white-space:pre-wrap}
+.racts{display:flex;gap:10px;margin-top:16px}
+.racts .btn{flex:1}
+.foot{text-align:center;font-size:11px;color:var(--sub);margin-top:24px;line-height:1.8}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(16px);opacity:0;
+  background:var(--green-d);color:#fff;padding:11px 20px;border-radius:999px;font-size:13px;
+  font-weight:700;transition:.28s;z-index:99;pointer-events:none;box-shadow:0 8px 20px rgba(0,0,0,.15)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:380px){
+  .wrap{padding:16px 14px 40px}
+  .hero{padding:28px 18px 26px}
+  .qcard{padding:20px 16px}
+  .opt{padding:13px 12px;font-size:13px}
+}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="wrap">
+
+  <!-- ==================== 首页 ==================== -->
+  <section class="page on" id="p-intro">
+    <div class="hero card">
+      <div class="seal">元素</div>
+      <h1>测一测<br>你的灵魂<br><span class="em">属于哪种元素</span></h1>
+      <div class="lead">40 道生活场景题，不考物理化学。<br>只凭你的下意识选择，找到构成你的那一种元素。</div>
+      <div class="tags"><span>火</span><span>水</span><span>风</span><span>土</span><span>光</span><span>影</span><span>冰</span><span>雷</span></div>
+      <div class="note">看见结果的第一反应大概是：这说的就是我。<br>记得发给朋友，问问 TA 是什么元素。</div>
+      <button class="btn primary start" id="startBtn">开始测试 →</button>
+    </div>
+    <div class="foot">趣味人格测试 · 只匹配气质与行事风格 · 结果仅供一乐</div>
+  </section>
+
+  <!-- ==================== 答题页 ==================== -->
+  <section class="page" id="p-quiz">
+    <div class="qtop">
+      <div class="row"><span>已完成</span><span><b id="qnum">1</b> / 40</span></div>
+      <div class="bar"><i id="barFill"></i></div>
+    </div>
+    <div class="qcard card">
+      <div class="qindex" id="qindex">QUESTION 01</div>
+      <div class="qtext" id="qtext"></div>
+      <div class="opts" id="opts"></div>
+      <div class="qnav">
+        <button class="btn ghost" id="prevBtn" disabled>上一题</button>
+        <button class="btn primary" id="nextBtn" disabled>下一题</button>
+      </div>
+      <div class="hint">凭直觉选就好，没有标准答案</div>
+    </div>
+  </section>
+
+  <!-- ==================== 结果页 ==================== -->
+  <section class="page" id="p-result">
+    <div class="rhead">
+      <div class="ico" id="rIco"></div>
+      <div class="kicker">你的本命元素</div>
+      <div class="name" id="rName"></div>
+      <div class="title" id="rTitle"></div>
+      <div class="match" id="rMatch"></div>
+    </div>
+
+    <div class="rsec card">
+      <h3><span class="n">1</span>为什么是你</h3>
+      <p id="rWhy"></p>
+      <div class="chips" id="rChips"></div>
+    </div>
+
+    <div class="rsec card">
+      <h3><span class="n">2</span>隐藏特质 & 小彩蛋</h3>
+      <p id="rEgg"></p>
+    </div>
+
+    <div class="slogan" id="rSlogan"></div>
+
+    <div class="share card">
+      <div class="lbl">｜ 一键复制分享文案</div>
+      <div class="txt" id="rShare"></div>
+    </div>
+
+    <div class="racts">
+      <button class="btn ghost" id="copyBtn">复制文案</button>
+      <button class="btn primary" id="againBtn">重新测试</button>
+    </div>
+    <div class="foot">把结果发给朋友，看看 TA 是什么元素 · 趣味测试，结果仅供一乐</div>
+  </section>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   8 个性格维度：每题考察一个主维度，选项附带次维度影响
+   每个维度 0-100，初始 50；选项数值为增量
+   ========================================================= */
+const DIMS = [
+  {k:'strategy', name:'谋略 / 果断'},
+  {k:'expression', name:'内敛 / 外放'},
+  {k:'order', name:'守序 / 破局'},
+  {k:'drive', name:'进取 / 自适'},
+  {k:'reason', name:'理性 / 感性'},
+  {k:'social', name:'领袖 / 独行'},
+  {k:'ground', name:'务实 / 浪漫'},
+  {k:'resolve', name:'坚韧 / 柔和'}
+];
+
+/* =========================================================
+   12 种元素人格：只取气质 / 风格 / 精神特质做正向匹配
+   ========================================================= */
+const HEROES = [
+  {
+    id: 'zhuge',
+    name: '钻石',
+    ico: '💎',
+    title: '坚硬澄澈的理性派',
+    vec: {
+      strategy: 95,
+      expression: 20,
+      order: 85,
+      drive: 70,
+      reason: 92,
+      social: 65,
+      ground: 75,
+      resolve: 88
+    },
+    why: '你结构稳定、内心澄澈，遇事不慌不乱。别人被情绪带着走，你却能守住自己的形状。这份坚硬，是你的底气。',
+    chips: [
+      '澄澈',
+      '坚硬',
+      '理性',
+      '可靠'
+    ],
+    egg: '你的隐藏属性是\'抗压钻石\'：压力越大，你越闪亮。朋友说你靠谱得像个定海神针。',
+    slogan: '坚硬，是因为足够清醒。'
+  },
+  {
+    id: 'zhangliang',
+    name: '深海',
+    ico: '🌊',
+    title: '深不可测的包容派',
+    vec: {
+      strategy: 92,
+      expression: 10,
+      order: 55,
+      drive: 22,
+      reason: 90,
+      social: 20,
+      ground: 50,
+      resolve: 60
+    },
+    why: '你看不见底，却包容万物。你习惯把想法藏在深处，不轻易表露。懂你的人知道，你内心广阔得超乎想象。',
+    chips: [
+      '深沉',
+      '包容',
+      '内敛',
+      '有城府'
+    ],
+    egg: '你可能是朋友圈里最\'深\'的那个人。别人猜不透你，但遇到大事第一个想找你商量。',
+    slogan: '深，是一种力量。'
+  },
+  {
+    id: 'lshipmin',
+    name: '烈火',
+    ico: '🔥',
+    title: '能量满满的引领派',
+    vec: {
+      strategy: 85,
+      expression: 75,
+      order: 55,
+      drive: 95,
+      reason: 78,
+      social: 95,
+      ground: 78,
+      resolve: 90
+    },
+    why: '你自带能量场，走到哪里都亮堂堂。你不甘平庸，也愿意带着别人一起向前。你的热情，是会传染的。',
+    chips: [
+      '热情',
+      '引领',
+      '高能',
+      '正能量'
+    ],
+    egg: '你是团队的永动机。朋友戏称你\'行走的小太阳\'，因为有你在就没人喊累。',
+    slogan: '发光，也发热。'
+  },
+  {
+    id: 'wuzetian',
+    name: '雷电',
+    ico: '⚡',
+    title: '果断爆发的破局派',
+    vec: {
+      strategy: 88,
+      expression: 65,
+      order: 12,
+      drive: 95,
+      reason: 85,
+      social: 88,
+      ground: 60,
+      resolve: 96
+    },
+    why: '你反应快、行动猛，讨厌拖泥带水。别人还在犹豫，你已经劈开一条路。你的果断，常常改变局面。',
+    chips: [
+      '果断',
+      '爆发',
+      '破局',
+      '行动力'
+    ],
+    egg: '你的爆发力惊人。朋友说你平时不显山露水，一到关键时刻就\'电光石火\'。',
+    slogan: '果断，改变局面。'
+  },
+  {
+    id: 'libai',
+    name: '清风',
+    ico: '🌬️',
+    title: '无拘无束的自由派',
+    vec: {
+      strategy: 15,
+      expression: 96,
+      order: 8,
+      drive: 55,
+      reason: 12,
+      social: 45,
+      ground: 8,
+      resolve: 58
+    },
+    why: '你不爱被定义，也不喜欢待在原地。对你来说，自由比稳定重要。你活得轻盈，是因为从不背不必要的包袱。',
+    chips: [
+      '自由',
+      '轻盈',
+      '不受束缚',
+      '洒脱'
+    ],
+    egg: '你是朋友圈里最难被安排的人。别人做计划，你负责临时起意——而且往往玩得最开心。',
+    slogan: '自由，是我的本质。'
+  },
+  {
+    id: 'wangwei',
+    name: '寒冰',
+    ico: '🧊',
+    title: '冷静克制的守序派',
+    vec: {
+      strategy: 28,
+      expression: 12,
+      order: 78,
+      drive: 15,
+      reason: 65,
+      social: 12,
+      ground: 25,
+      resolve: 68
+    },
+    why: '你冷静、克制、有棱有角。你用理性搭建秩序，也用原则守住边界。别人觉得你冷，其实你只是不想乱。',
+    chips: [
+      '冷静',
+      '克制',
+      '有原则',
+      '守序'
+    ],
+    egg: '你自带\'冷静结界\'。再乱的场面，你一开口大家就安静了，因为你说的总在点上。',
+    slogan: '冷静自有锋芒。'
+  },
+  {
+    id: 'sushi',
+    name: '暖阳',
+    ico: '☀️',
+    title: '温暖明亮的治愈派',
+    vec: {
+      strategy: 55,
+      expression: 90,
+      order: 30,
+      drive: 50,
+      reason: 20,
+      social: 88,
+      ground: 48,
+      resolve: 92
+    },
+    why: '你是那种让人一靠近就暖起来的人。你不求回报地散发光和热，把日子过得明亮又踏实。',
+    chips: [
+      '温暖',
+      '明亮',
+      '治愈',
+      '无私'
+    ],
+    egg: '你的温暖不挑人。朋友说你\'对谁都好\'，其实你只是把善意当成了本能。',
+    slogan: '温暖，是最好的能量。'
+  },
+  {
+    id: 'liqingzhao',
+    name: '月光',
+    ico: '🌙',
+    title: '柔软细腻的感受派',
+    vec: {
+      strategy: 40,
+      expression: 58,
+      order: 45,
+      drive: 28,
+      reason: 8,
+      social: 22,
+      ground: 18,
+      resolve: 82
+    },
+    why: '你敏感、细腻，能感知别人没说出口的情绪。你的温柔不张扬，却像月光一样，悄悄照亮人心。',
+    chips: [
+      '细腻',
+      '柔软',
+      '敏感',
+      '共情力强'
+    ],
+    egg: '你是\'读空气\'高手。别人还没开口，你已经察觉到气氛不对，贴心地化解尴尬。',
+    slogan: '柔软也能照亮人。'
+  },
+  {
+    id: 'yuefei',
+    name: '大地',
+    ico: '🌍',
+    title: '沉稳可靠的承载派',
+    vec: {
+      strategy: 62,
+      expression: 22,
+      order: 96,
+      drive: 78,
+      reason: 72,
+      social: 60,
+      ground: 88,
+      resolve: 97
+    },
+    why: '你稳重、务实，是别人眼里的\'定海神针\'。你不抢风头，却默默承载了很多。有你在，事情就塌不了。',
+    chips: [
+      '稳重',
+      '承载',
+      '务实',
+      '可靠'
+    ],
+    egg: '你是那种\'默默把事做完\'的人。朋友可能不常夸你，但关键时刻一定第一个想到你。',
+    slogan: '稳，是最高的评价。'
+  },
+  {
+    id: 'huamulan',
+    name: '钢铁',
+    ico: '🔩',
+    title: '百炼成钢的坚韧派',
+    vec: {
+      strategy: 55,
+      expression: 72,
+      order: 32,
+      drive: 92,
+      reason: 60,
+      social: 70,
+      ground: 80,
+      resolve: 96
+    },
+    why: '你经过反复淬炼，越挫越勇。别人以为你天生强大，其实你是一次次把自己锻造出来的。',
+    chips: [
+      '坚韧',
+      '淬炼',
+      '强大',
+      '越挫越勇'
+    ],
+    egg: '你的韧性让人佩服。朋友说你\'打不倒\'，因为你每次跌倒都能带着经验站起来。',
+    slogan: '百炼，方能成钢。'
+  },
+  {
+    id: 'xinqqi',
+    name: '星火',
+    ico: '✨',
+    title: '热烈浪漫的追光派',
+    vec: {
+      strategy: 60,
+      expression: 92,
+      order: 25,
+      drive: 88,
+      reason: 22,
+      social: 72,
+      ground: 28,
+      resolve: 85
+    },
+    why: '你热烈、外放，心里始终有光。你敢追、敢梦、敢投入，把平凡的日子过得闪闪发亮。',
+    chips: [
+      '热烈',
+      '浪漫',
+      '追光',
+      '真诚'
+    ],
+    egg: '你的浪漫很实在。别人送花，你会记得对方随口提过的小愿望，然后悄悄实现。',
+    slogan: '心里有光，眼里有火。'
+  },
+  {
+    id: 'taoyuanming',
+    name: '云雾',
+    ico: '🌫️',
+    title: '淡然自若的松弛派',
+    vec: {
+      strategy: 25,
+      expression: 12,
+      order: 10,
+      drive: 8,
+      reason: 52,
+      social: 8,
+      ground: 22,
+      resolve: 55
+    },
+    why: '你不争不抢，按自己的节奏飘着。别人忙着证明自己，你把松弛感活成了也是一种本事。',
+    chips: [
+      '松弛',
+      '淡然',
+      '自洽',
+      '不内耗'
+    ],
+    egg: '你是朋友圈里的松弛感担当。别人问你怎么这么淡定，你说：想开点就好了。',
+    slogan: '松弛，也是一种天赋。'
+  }
+];
+
+/* =========================================================
+   40 道生活场景题：不直白问价值观，不考历史知识
+   每题 4 个选项，选项指向不同性格维度倾向
+   ========================================================= */
+const Q = [
+  // —— 谋略 / 果断（5题）——
+  {q:'突然要去一座陌生城市待三天，你会？',opts:[
+    {x:'提前做攻略，把每天路线都排好',d:{strategy:3,order:1}},
+    {x:'大致看看攻略，留点弹性空间',d:{strategy:1}},
+    {x:'订好住处，剩下走到哪算哪',d:{strategy:-1,ground:-1}},
+    {x:'说走就走，边走边决定',d:{strategy:-3,order:-1}}]},
+  {q:'突然接到一个很复杂的任务，第一步是？',opts:[
+    {x:'先拆成小步骤，列一张清单',d:{strategy:3,order:1}},
+    {x:'找类似案例参考一下',d:{strategy:1,reason:1}},
+    {x:'从最容易的部分开始做',d:{strategy:-1}},
+    {x:'直接开干，边做边改',d:{strategy:-3,order:-1}}]},
+  {q:'下棋或打游戏时，你更享受哪种感觉？',opts:[
+    {x:'提前布局，步步算好',d:{strategy:3,reason:1}},
+    {x:'先观察对手，再决定怎么出招',d:{strategy:1}},
+    {x:'见招拆招，随机应变',d:{strategy:-1}},
+    {x:'凭直觉冲，图一个爽快',d:{strategy:-3,resolve:-1}}]},
+  {q:'一个等了很久的机会终于来了，你会？',opts:[
+    {x:'再准备充分一点才出手',d:{strategy:3,drive:-1}},
+    {x:'先小范围试一试水',d:{strategy:1}},
+    {x:'差不多就上，边做边调整',d:{strategy:-1}},
+    {x:'立刻抓住，先占住位置',d:{strategy:-3,drive:1}}]},
+  {q:'朋友问你"周末干嘛"，你的回答更像？',opts:[
+    {x:'"安排好了，几点干嘛都定了"',d:{strategy:3,order:1}},
+    {x:'"大概有个计划吧"',d:{strategy:1}},
+    {x:'"还没想，到时候再说"',d:{strategy:-1,ground:-1}},
+    {x:'"随缘，看心情"',d:{strategy:-3,drive:-1}}]},
+
+  // —— 内敛 / 外放（5题）——
+  {q:'在一场聚会上，你通常是？',opts:[
+    {x:'安静听大家说，偶尔点点头',d:{expression:-3,social:-1}},
+    {x:'只跟熟悉的人聊得开',d:{expression:-1}},
+    {x:'会主动认识几个新朋友',d:{expression:1,social:1}},
+    {x:'全场气氛组，带头玩起来',d:{expression:3,social:1}}]},
+  {q:'心情特别好时，你的第一反应是？',opts:[
+    {x:'偷偷开心，自己偷着乐',d:{expression:-3}},
+    {x:'找最亲近的人说一声',d:{expression:-1,social:1}},
+    {x:'发个动态分享出去',d:{expression:1,social:1}},
+    {x:'想叫上人一起庆祝',d:{expression:3,social:1}}]},
+  {q:'在一群陌生人里，你更倾向于？',opts:[
+    {x:'找个角落安静待着',d:{expression:-3,social:-1}},
+    {x:'先找到一个熟人陪着',d:{expression:-1}},
+    {x:'试着认识一两个人',d:{expression:1,social:1}},
+    {x:'很快成为大家注意的中心',d:{expression:3,social:1}}]},
+  {q:'你的手机相册里，最多的是？',opts:[
+    {x:'风景、静物、天空',d:{expression:-3,ground:-1}},
+    {x:'家人和朋友的合照',d:{expression:-1,social:1}},
+    {x:'自拍和打卡照',d:{expression:1}},
+    {x:'各种表情包和截图',d:{expression:3,ground:1}}]},
+  {q:'写完一篇东西，你会？',opts:[
+    {x:'自己看一遍就存起来',d:{expression:-3,social:-1}},
+    {x:'发给最信任的人看看',d:{expression:-1}},
+    {x:'发到朋友圈或平台上',d:{expression:1,social:1}},
+    {x:'希望有很多人来讨论',d:{expression:3,social:1}}]},
+
+  // —— 守序 / 破局（5题）——
+  {q:'面对一个用了很久的旧流程，你会？',opts:[
+    {x:'照着做，别出错最重要',d:{order:3,resolve:1}},
+    {x:'在不颠覆的前提下小优化',d:{order:1,ground:1}},
+    {x:'忍不住怀疑它是否合理',d:{order:-1,reason:1}},
+    {x:'干脆换一种新方式',d:{order:-3,ground:-1}}]},
+  {q:'平时穿衣服，你更偏好？',opts:[
+    {x:'经典基础款，怎么穿都对',d:{order:3}},
+    {x:'简单整洁就好',d:{order:1}},
+    {x:'喜欢混搭出自己的风格',d:{order:-1,expression:1}},
+    {x:'怎么舒服怎么来',d:{order:-3,ground:1}}]},
+  {q:'有人说"一直都是这样的"，你会？',opts:[
+    {x:'有道理，那就照做',d:{order:3,social:1}},
+    {x:'也许吧，看具体情况',d:{order:1}},
+    {x:'为什么不能改一改呢',d:{order:-1,reason:1}},
+    {x:'和我没关系，我做我的',d:{order:-3,social:-1}}]},
+  {q:'整理房间时，你通常会？',opts:[
+    {x:'每样东西都放回固定位置',d:{order:3}},
+    {x:'大致整齐就行',d:{order:1}},
+    {x:'随心摆放，顺手就好',d:{order:-1}},
+    {x:'乱中有序，我自己知道在哪',d:{order:-3,ground:-1}}]},
+  {q:'面对一个刚出的新东西，你的态度是？',opts:[
+    {x:'先观望，等口碑稳定',d:{order:3,drive:-1}},
+    {x:'看看别人评价再说',d:{order:1}},
+    {x:'第一批就想试试',d:{order:-1,drive:1}},
+    {x:'只要我喜欢就立刻冲',d:{order:-3,ground:-1}}]},
+
+  // —— 进取 / 自适（5题）——
+  {q:'如果突然多出一整天假期，你会？',opts:[
+    {x:'学点新东西，充实一下',d:{drive:3,ground:1}},
+    {x:'出门去探索个新地方',d:{drive:1,expression:1}},
+    {x:'在家好好休息一下',d:{drive:-1,expression:-1}},
+    {x:'什么都不安排，随缘度过',d:{drive:-3,order:-1}}]},
+  {q:'面对竞争，你的本能反应是？',opts:[
+    {x:'必须赢，全力以赴',d:{drive:3,resolve:1}},
+    {x:'尽力就好，别留遗憾',d:{drive:1}},
+    {x:'不太在意输赢',d:{drive:-1,ground:-1}},
+    {x:'能避就避，懒得争',d:{drive:-3,social:-1}}]},
+  {q:'你更欣赏哪种生活状态？',opts:[
+    {x:'不断突破自己',d:{drive:3}},
+    {x:'稳步向前，越来越好',d:{drive:1,order:1}},
+    {x:'安稳自在就很好',d:{drive:-1,resolve:-1}},
+    {x:'随心所欲，顺其自然',d:{drive:-3,order:-1}}]},
+  {q:'设定的目标进展不顺时，你会？',opts:[
+    {x:'加倍努力，绝不放弃',d:{drive:3,resolve:1}},
+    {x:'调整方法，再试一次',d:{drive:1,reason:1}},
+    {x:'降低期待，量力而行',d:{drive:-1,resolve:-1}},
+    {x:'换一个目标算了',d:{drive:-3}}]},
+  {q:'被人夸"你很有上进心"，你感觉？',opts:[
+    {x:'挺受用的，谢谢',d:{drive:3,expression:1}},
+    {x:'还好吧，应该的',d:{drive:1}},
+    {x:'我更想被夸"你很松弛"',d:{drive:-1,expression:-1}},
+    {x:'有点压力，别这么说',d:{drive:-3,resolve:-1}}]},
+
+  // —— 理性 / 感性（5题）——
+  {q:'做决定时，你更依赖什么？',opts:[
+    {x:'数据和逻辑',d:{reason:3}},
+    {x:'过去的经验',d:{reason:1,ground:1}},
+    {x:'内心的感觉',d:{reason:-1,ground:-1}},
+    {x:'身边人的建议',d:{reason:-1,social:1}}]},
+  {q:'看一部很催泪的电影，你会？',opts:[
+    {x:'忍不住分析剧情结构',d:{reason:3}},
+    {x:'默默感动，眼眶微热',d:{reason:1,expression:-1}},
+    {x:'哭得稀里哗啦',d:{reason:-1,expression:1}},
+    {x:'看完久久回味',d:{reason:-1,ground:-1}}]},
+  {q:'朋友做错事找你倾诉，你先？',opts:[
+    {x:'帮他分析对错得失',d:{reason:3,social:1}},
+    {x:'先安抚他的情绪',d:{reason:-1,social:1}},
+    {x:'陪他一起吐槽',d:{reason:-1,expression:1}},
+    {x:'直接给他解决办法',d:{reason:1,ground:1}}]},
+  {q:'在两份工作之间选择，你会？',opts:[
+    {x:'比较待遇和发展空间',d:{reason:3,drive:1}},
+    {x:'看哪个更有趣',d:{reason:-1,ground:-1}},
+    {x:'凭第一感觉决定',d:{reason:-1}},
+    {x:'听家人朋友的意见',d:{reason:-1,social:1}}]},
+  {q:'你更容易被什么打动？',opts:[
+    {x:'严密的论证',d:{reason:3}},
+    {x:'真诚的态度',d:{reason:1,social:1}},
+    {x:'动人的故事',d:{reason:-1,expression:1}},
+    {x:'细节里的温柔',d:{reason:-1,ground:-1}}]},
+
+  // —— 领袖 / 独行（5题）——
+  {q:'在团队里，你自然的角色是？',opts:[
+    {x:'组织协调，带带节奏',d:{social:3,drive:1}},
+    {x:'认真执行，配合大家',d:{social:1,order:1}},
+    {x:'负责出主意想办法',d:{social:1,reason:1}},
+    {x:'一个人研究自己那块',d:{social:-3,expression:-1}}]},
+  {q:'一群人意见不合时，你会？',opts:[
+    {x:'站出来拍个板',d:{social:3,drive:1}},
+    {x:'主动调和气氛',d:{social:1,reason:-1}},
+    {x:'提出一个折中的新方案',d:{social:1,reason:1}},
+    {x:'先保持沉默，听完再说',d:{social:-3,expression:-1}}]},
+  {q:'你更喜欢哪种工作方式？',opts:[
+    {x:'带团队一起冲',d:{social:3,drive:1}},
+    {x:'和别人协作完成',d:{social:1}},
+    {x:'独立负责一整块',d:{social:-1,order:1}},
+    {x:'远程自由，少社交',d:{social:-3,order:-1}}]},
+  {q:'朋友遇到难事，你第一反应是？',opts:[
+    {x:'组织大家一起帮忙',d:{social:3,drive:1}},
+    {x:'先陪在他身边',d:{social:1,reason:-1}},
+    {x:'帮他出谋划策',d:{social:1,reason:1}},
+    {x:'默默支持，不声张',d:{social:-3,expression:-1}}]},
+  {q:'一个人待久了，你会？',opts:[
+    {x:'很享受，正好充电',d:{social:-3,expression:-1}},
+    {x:'偶尔想找人聊两句',d:{social:-1}},
+    {x:'有点闷，想约人出门',d:{social:1,expression:1}},
+    {x:'特别想找人热闹一下',d:{social:3,expression:1}}]},
+
+  // —— 务实 / 浪漫（5题）——
+  {q:'如果能拥有一种超能力，你选？',opts:[
+    {x:'预知未来',d:{ground:3,strategy:1}},
+    {x:'瞬间移动',d:{ground:1,drive:1}},
+    {x:'自由飞翔',d:{ground:-1,expression:1}},
+    {x:'让时间暂停',d:{ground:-3,reason:-1}}]},
+  {q:'提到"诗和远方"，你会？',opts:[
+    {x:'先算算路费和假期够不够',d:{ground:3,reason:1}},
+    {x:'心里向往，先存着',d:{ground:1}},
+    {x:'立刻就想去出发',d:{ground:-1,drive:1}},
+    {x:'觉得那是生活的调味剂',d:{ground:-3,expression:1}}]},
+  {q:'你的消费观更接近？',opts:[
+    {x:'实用优先，能用就好',d:{ground:3}},
+    {x:'性价比最高最重要',d:{ground:1,reason:1}},
+    {x:'偶尔犒赏一下自己',d:{ground:-1,expression:1}},
+    {x:'为喜欢的东西买单',d:{ground:-3,reason:-1}}]},
+  {q:'给重要的人送礼物，你会送？',opts:[
+    {x:'一份实用的东西',d:{ground:3}},
+    {x:'定制的、有心意的物件',d:{ground:1,reason:1}},
+    {x:'一束花',d:{ground:-1,expression:1}},
+    {x:'一封手写的信',d:{ground:-3,reason:-1}}]},
+  {q:'如果有一笔意外之财，你会？',opts:[
+    {x:'存起来，以防万一',d:{ground:3,order:1}},
+    {x:'拿去投资点什么',d:{ground:1,drive:1}},
+    {x:'安排一次旅行',d:{ground:-1,expression:1}},
+    {x:'去实现一个小梦想',d:{ground:-3,reason:-1}}]},
+
+  // —— 坚韧 / 柔和（5题）——
+  {q:'被人误解的时候，你会？',opts:[
+    {x:'当场就说清楚',d:{resolve:3,expression:1}},
+    {x:'事后找机会解释',d:{resolve:1}},
+    {x:'先冷静一下再说',d:{resolve:-1,reason:1}},
+    {x:'算了，不解释了',d:{resolve:-3,social:-1}}]},
+  {q:'遇到不公平的事，你会？',opts:[
+    {x:'据理力争到底',d:{resolve:3,drive:1}},
+    {x:'找人帮忙说理',d:{resolve:1,social:1}},
+    {x:'忍一忍就过去了',d:{resolve:-1,order:1}},
+    {x:'换个角度想想',d:{resolve:-1,reason:1}}]},
+  {q:'你的脾气更接近哪一种？',opts:[
+    {x:'比较急，有话当场说',d:{resolve:3,expression:1}},
+    {x:'有原则，但不轻易发火',d:{resolve:1,order:1}},
+    {x:'随和，很少生气',d:{resolve:-1}},
+    {x:'几乎不生气',d:{resolve:-1,reason:1}}]},
+  {q:'坚持一件很难的事，靠的是？',opts:[
+    {x:'不服输的那股劲',d:{resolve:3,drive:1}},
+    {x:'清晰的目标感',d:{resolve:1,strategy:1}},
+    {x:'兴趣在支撑我',d:{resolve:-1,ground:-1}},
+    {x:'身边人的鼓励',d:{resolve:-1,social:1}}]},
+  {q:'朋友和你意见相反时，你会？',opts:[
+    {x:'试着说服他',d:{resolve:3,expression:1}},
+    {x:'求同存异就好',d:{resolve:1,reason:1}},
+    {x:'顺着他，别伤和气',d:{resolve:-1,social:1}},
+    {x:'懒得争，随他去吧',d:{resolve:-3,drive:-1}}]}
+];
+
+/* =========================================================
+   状态与工具
+   ========================================================= */
+let cur = 0;
+let answers = new Array(Q.length).fill(null);
+
+const $ = id => document.getElementById(id);
+const show = id => {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  $(id).classList.add('on');
+  window.scrollTo({top:0, behavior:'instant'});
+};
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('on'), 1800);
+}
+
+/* =========================================================
+   答题流程
+   ========================================================= */
+function render(){
+  const item = Q[cur];
+  const done = answers.filter(x=>x!==null).length;
+  $('qnum').textContent = done;
+  $('barFill').style.width = (done / Q.length * 100) + '%';
+  $('qindex').textContent = 'QUESTION ' + String(cur+1).padStart(2,'0');
+  $('qtext').textContent = item.q;
+  $('opts').innerHTML = item.opts.map((o,i)=>
+    `<button class="opt ${answers[cur]===i?'sel':''}" data-i="${i}">
+       <span class="k">${'ABCD'[i]}</span><span>${o.x}</span>
+     </button>`).join('');
+
+  document.querySelectorAll('.opt').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      answers[cur] = +btn.dataset.i;
+      document.querySelectorAll('.opt').forEach(b=>b.classList.remove('sel'));
+      btn.classList.add('sel');
+      $('nextBtn').disabled = false;
+      if(cur < Q.length-1){
+        clearTimeout(window._auto);
+        window._auto = setTimeout(()=>{ if(cur<Q.length-1) go(1); }, 360);
+      }
+    });
+  });
+
+  $('prevBtn').disabled = cur === 0;
+  $('nextBtn').disabled = answers[cur] === null;
+  $('nextBtn').textContent = cur === Q.length-1 ? '揭晓结果' : '下一题';
+}
+function go(step){
+  clearTimeout(window._auto);
+  const next = cur + step;
+  if(next < 0 || next >= Q.length) return;
+  cur = next; render();
+}
+$('startBtn').addEventListener('click',()=>{cur=0;answers.fill(null);render();show('p-quiz');});
+$('prevBtn').addEventListener('click',()=>go(-1));
+$('nextBtn').addEventListener('click',()=>{
+  if(cur===Q.length-1) result();
+  else go(1);
+});
+
+/* =========================================================
+   计分：维度累加 → 中心化余弦相似度比对 → 取最匹配
+   用"相对高低模式"匹配，避免中间型人物通吃
+   ========================================================= */
+const center = v => {
+  const m = DIMS.reduce((s,d)=>s+v[d.k],0)/DIMS.length;
+  return DIMS.map(d=>v[d.k]-m);
+};
+const cosine = (a,b) => {
+  let dot=0,na=0,nb=0;
+  for(let i=0;i<a.length;i++){ dot+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+  return dot/(Math.sqrt(na*nb)||1);
+};
+const HERO_C = HEROES.map(h=>({h, c:center(h.vec)}));
+
+function result(){
+  const score = {};
+  DIMS.forEach(d=>score[d.k]=50);
+  answers.forEach((idx,i)=>{
+    if(idx===null) return;
+    const d = Q[i].opts[idx].d;
+    for(const k in d) score[k] += d[k];
+  });
+
+  const uc = center(score);
+  let best = HEROES[0], bestSim = -Infinity;
+  HERO_C.forEach(({h,c})=>{
+    const sim = cosine(uc,c);
+    if(sim > bestSim){ bestSim = sim; best = h; }
+  });
+  const match = Math.max(80, Math.min(98, Math.round(78 + bestSim * 20)));
+
+  $('rIco').textContent = best.ico;
+  $('rName').textContent = best.name;
+  $('rTitle').textContent = best.title;
+  $('rMatch').textContent = '灵魂契合度 ' + match + '%';
+  $('rWhy').textContent = best.why;
+  $('rChips').innerHTML = best.chips.map(c=>`<span># ${c}</span>`).join('');
+  $('rEgg').textContent = best.egg;
+  $('rSlogan').textContent = '「' + best.slogan + '」';
+  const share = '我的本命元素是【' + best.name + '】' + best.ico + '\n' +
+                best.title + '｜契合度 ' + match + '%\n' +
+                best.slogan + '\n' +
+                '👉 来测测你的本命元素？#元素人格测试';
+  $('rShare').textContent = share;
+  $('copyBtn')._text = share;
+
+  show('p-result');
+}
+
+/* =========================================================
+   分享 / 重测
+   ========================================================= */
+$('copyBtn').addEventListener('click',async()=>{
+  const text = $('copyBtn')._text || '';
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+    }else{
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    toast('文案已复制，发给朋友比比看');
+  }catch(e){ toast('复制失败，请长按手动复制'); }
+});
+$('againBtn').addEventListener('click',()=>{cur=0;answers.fill(null);render();show('p-quiz');});
+</script>
+</body>
+</html>
